@@ -41,8 +41,8 @@
             bottom: 50px;
             left: 50%;
             transform: translateX(-50%);
-            width: min(180px, 35vw); /* تكبير الحجم */
-            height: min(180px, 35vw); /* تكبير الحجم */
+            width: min(160px, 30vw); /* تصغير الحجم */
+            height: min(160px, 30vw); /* تصغير الحجم */
             background-image: url('https://b.top4top.io/p_3360f0fzf1.png');
             background-size: contain;
             background-repeat: no-repeat;
@@ -161,8 +161,8 @@
             
             .player {
                 bottom: 15vh;
-                width: min(160px, 40vw); /* حجم أكبر للهواتف */
-                height: min(160px, 40vw); /* حجم أكبر للهواتف */
+                width: min(140px, 35vw); /* تصغير حجم الشخصية للهواتف */
+                height: min(140px, 35vw); /* تصغير حجم الشخصية للهواتف */
             }
         }
     </style>
@@ -436,10 +436,20 @@
                 isDragging = false;
             });
 
-            // إزالة المعالجات القديمة
-            // Remove or comment out these old event listeners:
-            // gameContainer.addEventListener('mousemove', function(e) {...});
-            // gameContainer.addEventListener('touchmove', function(e) {...});
+            // إضافة معالج حدث لزر إعادة المحاولة
+            restartBtn.addEventListener('click', function() {
+                init(); // إعادة تشغيل اللعبة
+                const playSound = async () => {
+                    try {
+                        wasteSound.currentTime = 0;
+                        wasteSound.volume = 0.1;
+                        await wasteSound.play();
+                    } catch (error) {
+                        console.log('تعذر تشغيل صوت البداية:', error);
+                    }
+                };
+                playSound();
+            });
             
         });
     </script>
