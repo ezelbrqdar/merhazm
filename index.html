@@ -41,8 +41,8 @@
             bottom: 50px;
             left: 50%;
             transform: translateX(-50%);
-            width: min(160px, 30vw); /* تصغير الحجم */
-            height: min(160px, 30vw); /* تصغير الحجم */
+            width: min(140px, 25vw); /* تصغير إضافي للحجم */
+            height: min(140px, 25vw); /* تصغير إضافي للحجم */
             background-image: url('https://b.top4top.io/p_3360f0fzf1.png');
             background-size: contain;
             background-repeat: no-repeat;
@@ -161,8 +161,8 @@
             
             .player {
                 bottom: 15vh;
-                width: min(140px, 35vw); /* تصغير حجم الشخصية للهواتف */
-                height: min(140px, 35vw); /* تصغير حجم الشخصية للهواتف */
+                width: min(120px, 30vw); /* تصغير إضافي للهواتف */
+                height: min(120px, 30vw); /* تصغير إضافي للهواتف */
             }
         }
     </style>
@@ -396,16 +396,27 @@
             player.addEventListener('mousedown', function(e) {
                 if (!gameRunning) return;
                 isDragging = true;
-                dragOffsetX = e.clientX - player.offsetLeft;
+                dragOffsetX = e.clientX - (parseFloat(player.style.left) || playerPosition);
                 player.style.cursor = 'grabbing';
             });
 
             document.addEventListener('mousemove', function(e) {
                 if (!gameRunning || !isDragging) return;
                 e.preventDefault();
-                const newX = e.clientX - dragOffsetX;
-                const maxX = gameContainer.clientWidth - player.clientWidth;
-                playerPosition = Math.max(0, Math.min(newX, maxX));
+                let newX = e.clientX - dragOffsetX;
+                
+                // إذا تجاوزت الشخصية الحد الأيمن، نعيدها إلى اليسار
+                if (newX > gameContainer.clientWidth) {
+                    newX = -player.clientWidth;
+                    dragOffsetX = e.clientX - newX; // تحديث نقطة البداية
+                }
+                // إذا تجاوزت الشخصية الحد الأيسر، نعيدها إلى اليمين
+                else if (newX < -player.clientWidth) {
+                    newX = gameContainer.clientWidth;
+                    dragOffsetX = e.clientX - newX; // تحديث نقطة البداية
+                }
+                
+                playerPosition = newX;
                 player.style.left = `${playerPosition}px`;
             });
 
@@ -419,16 +430,27 @@
                 if (!gameRunning) return;
                 isDragging = true;
                 const touch = e.touches[0];
-                dragOffsetX = touch.clientX - player.offsetLeft;
+                dragOffsetX = touch.clientX - (parseFloat(player.style.left) || playerPosition);
             });
 
             player.addEventListener('touchmove', function(e) {
                 if (!gameRunning || !isDragging) return;
                 e.preventDefault();
                 const touch = e.touches[0];
-                const newX = touch.clientX - dragOffsetX;
-                const maxX = gameContainer.clientWidth - player.clientWidth;
-                playerPosition = Math.max(0, Math.min(newX, maxX));
+                let newX = touch.clientX - dragOffsetX;
+                
+                // إذا تجاوزت الشخصية الحد الأيمن، نعيدها إلى اليسار
+                if (newX > gameContainer.clientWidth) {
+                    newX = -player.clientWidth;
+                    dragOffsetX = touch.clientX - newX; // تحديث نقطة البداية
+                }
+                // إذا تجاوزت الشخصية الحد الأيسر، نعيدها إلى اليمين
+                else if (newX < -player.clientWidth) {
+                    newX = gameContainer.clientWidth;
+                    dragOffsetX = touch.clientX - newX; // تحديث نقطة البداية
+                }
+                
+                playerPosition = newX;
                 player.style.left = `${playerPosition}px`;
             }, { passive: false });
 
