@@ -38,11 +38,11 @@
         
         .player {
             position: absolute;
-            bottom: 20px;
+            bottom: 50px;
             left: 50%;
             transform: translateX(-50%);
-            width: min(130px, 25vw);
-            height: min(130px, 25vw);
+            width: min(180px, 35vw); /* تكبير الحجم */
+            height: min(180px, 35vw); /* تكبير الحجم */
             background-image: url('https://l.top4top.io/p_33603a5ww1.png');
             background-size: contain;
             background-repeat: no-repeat;
@@ -50,6 +50,11 @@
             z-index: 10;
             transition: transform 0.1s;
             touch-action: none;
+            cursor: grab;
+        }
+
+        .player:active {
+            cursor: grabbing;
         }
         
         .item {
@@ -155,7 +160,9 @@
             }
             
             .player {
-                bottom: 10vh;
+                bottom: 15vh;
+                width: min(160px, 40vw); /* حجم أكبر للهواتف */
+                height: min(160px, 40vw); /* حجم أكبر للهواتف */
             }
         }
     </style>
@@ -382,23 +389,58 @@
                 clearInterval(itemInterval);
             }
             
-            // Move player with mouse
-            gameContainer.addEventListener('mousemove', function(e) {
+            let isDragging = false;
+            let dragOffsetX = 0;
+
+            // تحديث التحكم بالماوس
+            player.addEventListener('mousedown', function(e) {
                 if (!gameRunning) return;
-                playerPosition = e.clientX;
+                isDragging = true;
+                dragOffsetX = e.clientX - player.offsetLeft;
+                player.style.cursor = 'grabbing';
+            });
+
+            document.addEventListener('mousemove', function(e) {
+                if (!gameRunning || !isDragging) return;
+                e.preventDefault();
+                const newX = e.clientX - dragOffsetX;
+                const maxX = gameContainer.clientWidth - player.clientWidth;
+                playerPosition = Math.max(0, Math.min(newX, maxX));
                 player.style.left = `${playerPosition}px`;
             });
-            
-            // Touch controls for mobile
-            gameContainer.addEventListener('touchmove', function(e) {
+
+            document.addEventListener('mouseup', function() {
+                isDragging = false;
+                player.style.cursor = 'grab';
+            });
+
+            // تحديث التحكم باللمس
+            player.addEventListener('touchstart', function(e) {
                 if (!gameRunning) return;
+                isDragging = true;
+                const touch = e.touches[0];
+                dragOffsetX = touch.clientX - player.offsetLeft;
+            });
+
+            player.addEventListener('touchmove', function(e) {
+                if (!gameRunning || !isDragging) return;
                 e.preventDefault();
-                playerPosition = e.touches[0].clientX;
+                const touch = e.touches[0];
+                const newX = touch.clientX - dragOffsetX;
+                const maxX = gameContainer.clientWidth - player.clientWidth;
+                playerPosition = Math.max(0, Math.min(newX, maxX));
                 player.style.left = `${playerPosition}px`;
             }, { passive: false });
+
+            player.addEventListener('touchend', function() {
+                isDragging = false;
+            });
+
+            // إزالة المعالجات القديمة
+            // Remove or comment out these old event listeners:
+            // gameContainer.addEventListener('mousemove', function(e) {...});
+            // gameContainer.addEventListener('touchmove', function(e) {...});
             
-            // Restart game button
-            restartBtn.addEventListener('click', init);
         });
     </script>
 </body>
