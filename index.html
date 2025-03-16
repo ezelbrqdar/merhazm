@@ -21,6 +21,33 @@
             width: 100%;
             height: 100vh;
             overflow: hidden;
+            background: linear-gradient(45deg, #6200ee, #03dac6);
+            animation: gradientBG 15s ease infinite;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-container::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            top: -50%;
+            left: -50%;
+            background: radial-gradient(circle, transparent 20%, #000 100%);
+            opacity: 0.1;
+            animation: waves 8s linear infinite;
+        }
+
+        @keyframes waves {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
         
         .game-info {
@@ -34,6 +61,11 @@
             font-weight: bold;
             color: #6200ee;
             z-index: 100;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
         }
         
         .player {
@@ -48,13 +80,102 @@
             background-repeat: no-repeat;
             background-position: center;
             z-index: 10;
-            transition: transform 0.1s;
+            transition: transform 0.15s ease-out; /* تقليل وقت الانتقال للحركة أكثر سلاسة */
             touch-action: none;
             cursor: grab;
+            will-change: transform, left; /* تحسين الأداء */
+            filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.4));
+            transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .player:active {
-            cursor: grabbing;
+        .player:hover {
+            transform: translateX(-50%) scale(1.05);
+        }
+
+        .player.level2 {
+            background-image: url('https://g.top4top.io/p_3361gluzd1.png');
+        }
+
+        /* إضافة تأثير للانتقال السلس عند تجاوز الحدود */
+        .player.transition-right {
+            animation: slideFromLeft 0.3s ease-out;
+        }
+
+        .player.transition-left {
+            animation: slideFromRight 0.3s ease-out;
+        }
+
+        @keyframes slideFromLeft {
+            from { transform: translateX(-100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideFromRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* تحسين تأثيرات الانتقال */
+        .player.transition-right {
+            animation: slideFromLeft 0.3s ease-out;
+        }
+
+        .player.transition-left {
+            animation: slideFromRight 0.3s ease-out;
+        }
+
+        @keyframes slideFromLeft {
+            from { 
+                transform: translateX(-150%) scale(0.8);
+                opacity: 0.5;
+            }
+            to { 
+                transform: translateX(0) scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideFromRight {
+            from { 
+                transform: translateX(150%) scale(0.8);
+                opacity: 0.5;
+            }
+            to { 
+                transform: translateX(0) scale(1);
+                opacity: 1;
+            }
+        }
+
+        .level-up {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: gold;
+            padding: 20px;
+            border-radius: 10px;
+            font-size: 24px;
+            z-index: 1000;
+            animation: fadeInOut 2s forwards;
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid #ffcc00;
+            box-shadow: 0 0 20px rgba(255, 204, 0, 0.5);
+            transform-origin: center;
+            animation: levelUpPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; }
+            20% { opacity: 1; }
+            80% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        @keyframes levelUpPop {
+            0% { transform: translate(-50%, -50%) scale(0); }
+            50% { transform: translate(-50%, -50%) scale(1.2); }
+            100% { transform: translate(-50%, -50%) scale(1); }
         }
         
         .item {
@@ -67,6 +188,12 @@
             font-size: min(40px, 12vw);
             background: none;
             z-index: 5;
+            filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.2));
+            transition: transform 0.2s;
+        }
+
+        .item:hover {
+            transform: scale(1.2) rotate(15deg) !important;
         }
         
         .waste::after {
@@ -82,11 +209,21 @@
             font-size: 30px;
             animation: splash 0.5s forwards;
             z-index: 20;
+            filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
+            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.8));
         }
         
         @keyframes splash {
-            0% { transform: scale(0.5); opacity: 1; }
-            100% { transform: scale(2); opacity: 0; }
+            0% { 
+                transform: scale(0.5); 
+                opacity: 1;
+                filter: hue-rotate(0deg);
+            }
+            100% { 
+                transform: scale(2.5); 
+                opacity: 0;
+                filter: hue-rotate(360deg);
+            }
         }
         
         .shake {
@@ -112,6 +249,8 @@
             background-color: rgba(0, 0, 0, 0.8);
             color: white;
             z-index: 50;
+            backdrop-filter: blur(10px);
+            background: rgba(0, 0, 0, 0.85);
         }
         
         .title {
@@ -121,6 +260,16 @@
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
             padding: 0 20px;
             text-align: center;
+            background: linear-gradient(45deg, #ffcc00, #ff6b6b);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: titleGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes titleGlow {
+            0%, 100% { text-shadow: 0 0 20px rgba(255, 204, 0, 0.5); }
+            50% { text-shadow: 0 0 30px rgba(255, 107, 107, 0.8); }
         }
         
         .subtitle {
@@ -141,17 +290,61 @@
             cursor: pointer;
             transition: all 0.3s;
             -webkit-tap-highlight-color: transparent;
+            background: linear-gradient(45deg, #6200ee, #03dac6);
+            border: none;
+            padding: 15px 30px;
+            color: white;
+            font-weight: bold;
+            border-radius: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
         }
-        
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                120deg,
+                transparent,
+                rgba(255, 255, 255, 0.3),
+                transparent
+            );
+            transition: 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
         .btn:hover {
-            background-color: #3700b3;
-            transform: scale(1.05);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(1px);
         }
         
         .score-display {
             font-size: min(36px, 7vw);
             margin-bottom: 20px;
             color: #ffcc00;
+            background: linear-gradient(45deg, #ffcc00, #ff6b6b);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: scoreGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes scoreGlow {
+            0%, 100% { text-shadow: 0 0 10px rgba(255, 204, 0, 0.5); }
+            50% { text-shadow: 0 0 20px rgba(255, 107, 107, 0.8); }
         }
 
         .credits {
@@ -159,6 +352,10 @@
             color: #aaa;
             margin-top: 20px;
             font-family: 'Almarai', sans-serif;
+            background: linear-gradient(45deg, #aaa, #fff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
         }
 
         @media (max-width: 768px) {
@@ -171,6 +368,39 @@
                 width: min(120px, 30vw); /* تصغير إضافي للهواتف */
                 height: min(120px, 30vw); /* تصغير إضافي للهواتف */
             }
+        }
+
+        .level2-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 15px 30px;
+            font-size: 24px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            animation: pulse 1.5s infinite;
+            z-index: 1000;
+            font-family: 'Almarai', sans-serif;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+            transition: all 0.3s ease;
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(76, 175, 80, 0.4);
+        }
+
+        .level2-button:hover {
+            transform: translate(-50%, -50%) scale(1.05);
+            box-shadow: 0 12px 40px rgba(76, 175, 80, 0.6);
+        }
+
+        @keyframes pulse {
+            0% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.1); }
+            100% { transform: translate(-50%, -50%) scale(1); }
         }
     </style>
 </head>
@@ -195,6 +425,7 @@
             <button class="btn" id="restart-btn">حاول مرة أخرى</button>
             <div class="credits">تم برمجة اللعبة بواسطة : ☀Sumer𒀭</div>
         </div>
+        <button class="level2-button" id="level2-btn" style="display: none;">ابدأ المرحلة الثانية!</button>
     </div>
 
     <script>
@@ -207,12 +438,15 @@
             const gameOverScreen = document.querySelector('.game-over');
             const startBtn = document.getElementById('start-btn');
             const restartBtn = document.getElementById('restart-btn');
+            const level2Btn = document.getElementById('level2-btn');
             
             let score = 0;
             let gameRunning = false;
             let playerPosition = window.innerWidth / 2;
             let items = [];
             let itemInterval;
+            let currentLevel = 1;
+            let isLevel1Complete = false;
             
             // تعريف الأصوات الجديدة
             const soundEffects = {
@@ -263,6 +497,10 @@
             // Initialize game
             function init() {
                 score = 0;
+                currentLevel = 1;
+                isLevel1Complete = false;
+                player.classList.remove('level2');
+                level2Btn.style.display = 'none';
                 scoreDisplay.textContent = score;
                 playerPosition = window.innerWidth / 2;
                 player.style.left = `${playerPosition}px`;
@@ -287,18 +525,20 @@
                 const item = document.createElement('div');
                 item.className = 'item';
                 
-                // Random position
-                const position = Math.random() * (window.innerWidth - 50);
+                // توزيع أفضل للعناصر
+                const position = Math.random() * (window.innerWidth - 100) + 50;
                 item.style.left = `${position}px`;
                 item.style.top = '-50px';
                 
-                // Random type (70% waste, 30% fruit)
-                const isWaste = Math.random() < 0.7;
+                // تحسين نسبة ظهور العناصر حسب المستوى
+                const wasteProbability = currentLevel === 2 ? 0.65 : 0.7;
+                const isWaste = Math.random() < wasteProbability;
+                
                 item.classList.add(isWaste ? 'waste' : 'fruit');
                 item.dataset.type = isWaste ? 'waste' : 'fruit';
                 
                 if (!isWaste) {
-                    const fruits = ['🍎', '🍌', '🍒'];
+                    const fruits = ['🍎', '🍌', '🍒', '🍇', '🍊']; // إضافة المزيد من الفواكه
                     item.dataset.fruit = fruits[Math.floor(Math.random() * fruits.length)];
                 }
                 
@@ -308,16 +548,23 @@
             
             // Animate a falling item
             function animateItem(item) {
-                const speed = Math.random() * 3 + 2;
+                const baseSpeed = currentLevel === 2 ? 3 : 2;
+                const speed = Math.random() * 2 + baseSpeed;
+                const wobbleAmount = 1.5;
                 let posY = -50;
+                let posX = parseFloat(item.style.left);
                 let rotation = 0;
+                let wobbleOffset = 0;
                 
                 const animate = () => {
                     if (!gameRunning) return;
                     
                     posY += speed;
                     rotation += 2;
+                    wobbleOffset = Math.sin(posY * 0.02) * wobbleAmount;
+                    
                     item.style.top = `${posY}px`;
+                    item.style.left = `${posX + wobbleOffset}px`;
                     item.style.transform = `rotate(${rotation}deg)`;
                     
                     // Check for collision with player
@@ -334,31 +581,16 @@
                         item.remove();
                         
                         if (item.dataset.type === 'waste') {
-                            score += 10;
-                            scoreDisplay.textContent = score;
+                            updateScore(score + 10);
                             createSplash('💰', itemRect.left, itemRect.top);
                             // تشغيل صوت التقاط الفضلات
-                            try {
-                                const newWasteSound = new Audio(soundEffects.waste);
-                                newWasteSound.volume = 0.5;
-                                newWasteSound.playbackRate = 0.8 + Math.random() * 0.4;
-                                newWasteSound.play().catch(e => console.log('خطأ في تشغيل الصوت:', e));
-                            } catch (e) {
-                                console.log('خطأ في تشغيل الصوت:', e);
-                            }
+                            playSound('waste', 0.8 + Math.random() * 0.4);
                             player.classList.add('shake');
                             setTimeout(() => player.classList.remove('shake'), 500);
                         } else {
                             gameOver();
                             // تشغيل صوت التقاط الفاكهة
-                            try {
-                                const newFruitSound = new Audio(soundEffects.fruit);
-                                newFruitSound.volume = 0.5;
-                                newFruitSound.playbackRate = 1.2;
-                                newFruitSound.play().catch(e => console.log('خطأ في تشغيل الصوت:', e));
-                            } catch (e) {
-                                console.log('خطأ في تشغيل الصوت:', e);
-                            }
+                            playSound('fruit', 1.2);
                             createSplash('🤢', itemRect.left, itemRect.top);
                         }
                         
@@ -384,10 +616,11 @@
                 splash.textContent = emoji;
                 splash.style.left = `${x}px`;
                 splash.style.top = `${y}px`;
+                splash.style.transform = `scale(${Math.random() * 0.5 + 0.8})`;
                 gameContainer.appendChild(splash);
                 
                 // Remove after animation
-                setTimeout(() => splash.remove(), 500);
+                setTimeout(() => splash.remove(), 800);
             }
             
             // Game over
@@ -400,41 +633,42 @@
             
             let isDragging = false;
             let dragOffsetX = 0;
+            let lastMouseX = 0;
 
-            // تحديث التحكم بالماوس
+            // تحسين التحكم بالماوس ولوحة المفاتيح
+            const moveSpeed = 35; // زيادة سرعة الحركة
+            const keyboardMoveSpeed = 40; // سرعة أعلى للوحة المفاتيح
+            let lastFrameTime = 0;
+            
+            // تحسين حركة الماوس
             player.addEventListener('mousedown', function(e) {
                 if (!gameRunning) return;
                 isDragging = true;
-                dragOffsetX = e.clientX - (parseFloat(player.style.left) || playerPosition);
+                lastMouseX = e.clientX;
+                dragOffsetX = e.clientX - player.offsetLeft;
                 player.style.cursor = 'grabbing';
+                e.preventDefault();
             });
 
+            // تحديث كود التحكم بالماوس
             document.addEventListener('mousemove', function(e) {
                 if (!gameRunning || !isDragging) return;
                 e.preventDefault();
-                let newX = e.clientX - dragOffsetX;
                 
-                // إذا تجاوزت الشخصية الحد الأيمن، نعيدها إلى اليسار
-                if (newX > gameContainer.clientWidth) {
-                    newX = -player.clientWidth;
-                    dragOffsetX = e.clientX - newX; // تحديث نقطة البداية
-                }
-                // إذا تجاوزت الشخصية الحد الأيسر، نعيدها إلى اليمين
-                else if (newX < -player.clientWidth) {
-                    newX = gameContainer.clientWidth;
-                    dragOffsetX = e.clientX - newX; // تحديث نقطة البداية
-                }
+                const containerWidth = gameContainer.clientWidth;
+                const playerWidth = player.offsetWidth;
+                const mouseDelta = e.clientX - lastMouseX;
+                const moveMultiplier = 2.0;
                 
+                let newX = playerPosition + (mouseDelta * moveMultiplier);
+                
+                // السماح بتجاوز حدود الشاشة دون الظهور في الجهة المقابلة
                 playerPosition = newX;
-                player.style.left = `${playerPosition}px`;
+                player.style.left = `${newX}px`;
+                lastMouseX = e.clientX;
             });
 
-            document.addEventListener('mouseup', function() {
-                isDragging = false;
-                player.style.cursor = 'grab';
-            });
-
-            // تحديث التحكم باللمس
+            // تحسين التحكم باللمس
             player.addEventListener('touchstart', function(e) {
                 if (!gameRunning) return;
                 isDragging = true;
@@ -442,29 +676,50 @@
                 dragOffsetX = touch.clientX - (parseFloat(player.style.left) || playerPosition);
             });
 
+            // تحديث التحكم باللمس
             player.addEventListener('touchmove', function(e) {
-                if (!gameRunning || !isDragging) return;
+                if (!gameRunning) return;
                 e.preventDefault();
+                
                 const touch = e.touches[0];
-                let newX = touch.clientX - dragOffsetX;
+                const containerWidth = gameContainer.clientWidth;
+                const playerWidth = player.offsetWidth;
+                const touchDelta = touch.clientX - lastMouseX;
+                const moveMultiplier = 2.5;
                 
-                // إذا تجاوزت الشخصية الحد الأيمن، نعيدها إلى اليسار
-                if (newX > gameContainer.clientWidth) {
-                    newX = -player.clientWidth;
-                    dragOffsetX = touch.clientX - newX; // تحديث نقطة البداية
-                }
-                // إذا تجاوزت الشخصية الحد الأيسر، نعيدها إلى اليمين
-                else if (newX < -player.clientWidth) {
-                    newX = gameContainer.clientWidth;
-                    dragOffsetX = touch.clientX - newX; // تحديث نقطة البداية
-                }
+                let newX = playerPosition + (touchDelta * moveMultiplier);
                 
+                // السماح بتجاوز حدود الشاشة دون الظهور في الجهة المقابلة
                 playerPosition = newX;
-                player.style.left = `${playerPosition}px`;
+                player.style.left = `${newX}px`;
+                lastMouseX = touch.clientX;
             }, { passive: false });
 
             player.addEventListener('touchend', function() {
                 isDragging = false;
+            });
+
+            // تحسين التحكم بلوحة المفاتيح
+            // تحديث التحكم بلوحة المفاتيح
+            document.addEventListener('keydown', function(e) {
+                if (!gameRunning) return;
+                
+                const containerWidth = gameContainer.clientWidth;
+                const playerWidth = player.offsetWidth;
+                const keyboardSpeed = 45;
+                
+                switch(e.key) {
+                    case 'ArrowLeft':
+                    case 'a':
+                        playerPosition -= keyboardSpeed;
+                        break;
+                    case 'ArrowRight':
+                    case 'd':
+                        playerPosition += keyboardSpeed;
+                        break;
+                }
+                
+                player.style.left = `${playerPosition}px`;
             });
 
             // إضافة معالج حدث لزر إعادة المحاولة
@@ -481,6 +736,84 @@
                 };
                 playSound();
             });
+
+            function updateScore(newScore) {
+                score = newScore;
+                scoreDisplay.textContent = score;
+                
+                // التحقق من اكتمال المرحلة الأولى
+                if (score >= 500 && !isLevel1Complete) {
+                    isLevel1Complete = true;
+                    gameRunning = false;
+                    clearInterval(itemInterval);
+                    
+                    // إظهار زر بدء المرحلة الثانية
+                    level2Btn.style.display = 'block';
+                    
+                    // رسالة النجاح
+                    const levelUpMessage = document.createElement('div');
+                    levelUpMessage.className = 'level-up';
+                    levelUpMessage.textContent = 'مبروك! لقد أكملت المرحلة الأولى! 🎉';
+                    gameContainer.appendChild(levelUpMessage);
+                    
+                    // حذف رسالة النجاح بعد فترة
+                    setTimeout(() => {
+                        levelUpMessage.remove();
+                    }, 2000);
+
+                    // تشغيل صوت النجاح
+                    try {
+                        const levelUpSound = new Audio('https://www.myinstants.com/media/sounds/level-up-sound-effect.mp3');
+                        levelUpSound.volume = 0.5;
+                        levelUpSound.play().catch(e => console.log('خطأ في تشغيل الصوت:', e));
+                    } catch (e) {
+                        console.log('خطأ في تشغيل صوت النجاح:', e);
+                    }
+                }
+            }
+
+            // إضافة معالج النقر على زر المرحلة الثانية
+            level2Btn.addEventListener('click', function() {
+                // بدء المرحلة الثانية
+                currentLevel = 2;
+                player.classList.add('level2');
+                level2Btn.style.display = 'none';
+                gameRunning = true;
+                
+                // إعادة تشغيل تساقط العناصر بسرعة أكبر
+                if (itemInterval) clearInterval(itemInterval);
+                itemInterval = setInterval(createItem, 800); // تسريع معدل التساقط
+                
+                // رسالة بدء المرحلة الثانية
+                const startLevel2Message = document.createElement('div');
+                startLevel2Message.className = 'level-up';
+                startLevel2Message.textContent = 'المرحلة الثانية: السرعة تزداد! 🚀';
+                gameContainer.appendChild(startLevel2Message);
+                
+                setTimeout(() => {
+                    startLevel2Message.remove();
+                }, 2000);
+            });
+
+            function smoothBorderTransition(direction) {
+                const transitionClass = direction === 'right' ? 'transition-right' : 'transition-left';
+                player.classList.remove('transition-right', 'transition-left'); // إزالة الصفوف السابقة
+                void player.offsetWidth; // إعادة تشغيل الرسوم المتحركة
+                player.classList.add(transitionClass);
+                setTimeout(() => player.classList.remove(transitionClass), 300);
+            }
+
+            // تحسين تأثيرات الصوت
+            function playSound(type, pitch = 1) {
+                try {
+                    const audio = new Audio(soundEffects[type]);
+                    audio.volume = 0.4;
+                    audio.playbackRate = pitch;
+                    audio.play().catch(e => console.log('خطأ في تشغيل الصوت:', e));
+                } catch (e) {
+                    console.log('خطأ في تشغيل الصوت:', e);
+                }
+            }
             
         });
     </script>
